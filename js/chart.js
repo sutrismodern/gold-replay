@@ -5,7 +5,7 @@
 const chartContainer = document.getElementById("chart");
 const status = document.getElementById("status");
 
-const chart = LightweightCharts.createChart(chartContainer, {
+App.chart = LightweightCharts.createChart(chartContainer, {
     width: chartContainer.clientWidth,
     height: chartContainer.clientHeight,
 
@@ -39,7 +39,7 @@ const chart = LightweightCharts.createChart(chartContainer, {
     }
 });
 
-const candleSeries = chart.addCandlestickSeries({
+App.candleSeries = chart.addCandlestickSeries({
     upColor: "#26a69a",
     downColor: "#ef5350",
 
