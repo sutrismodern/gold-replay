@@ -98,7 +98,12 @@ const Trade = {
 
     cancelPending(id) {
         const order = this.state.orders.find(item => item.id === id);
-        if (order) order.status = "CANCELLED";
+
+        if (order) {
+            order.status = "CANCELLED";
+            order.cancelledBar = Replay.index;
+            order.cancelledTime = Replay.current()?.time ?? null;
+        }
 
         this.removePending(id);
         UI.updateStatus("Pending order cancelled");
@@ -268,7 +273,10 @@ const Trade = {
     },
 
     rebuildTo(index) {
-        const orders = this.state.orders.map(order => ({ ...order, status: "PENDING" }));
+        const orders = this.state.orders.map(order => ({
+            ...order,
+            status: order.status === "CANCELLED" ? "CANCELLED" : "PENDING"
+        }));
 
         this.reset(false);
         this.state.orders = orders;
