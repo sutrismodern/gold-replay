@@ -1,43 +1,35 @@
 const App = {
-
-    // ===== DATA =====
-
     candles: [],
 
-    // ===== CHART =====
-
     chart: null,
-
     candleSeries: null,
 
-    // ===== REPLAY =====
-
     replay: {
-
-        start: 300,
-
-        index: 300
-
+        start: 0,
+        index: 0,
+        playing: false,
+        timer: null,
+        speed: 1000
     },
 
-    // ===== ORDER =====
-
-    orders: [],
-
-    history: [],
-
-    // ===== DRAWING =====
+    trading: {
+        nextId: 1,
+        pending: [],
+        positions: [],
+        history: [],
+        settings: {
+            symbol: "XAUUSD",
+            pointValue: 100,
+            spread: 0,
+            slippage: 0,
+            intrabarMode: "conservative"
+        }
+    },
 
     drawings: [],
 
-    // ===== INDICATORS =====
-
     indicators: {
-
         ema: [],
-
         atr: null
-
     }
-
 };
