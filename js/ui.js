@@ -1,19 +1,30 @@
-const UI={
+const UI = {
+    counter: document.getElementById("counter"),
+    status: document.getElementById("status"),
 
-    counter:document.getElementById("counter"),
+    updateCounter() {
+        const total = App.candles.length;
+        const current = total ? Replay.index + 1 : 0;
 
-    updateCounter(){
+        this.counter.innerHTML = `Bar : ${current} / ${total}`;
+    },
 
-        this.counter.innerHTML=
+    updateStatus(message) {
+        if (message) {
+            this.status.innerHTML = message;
+            return;
+        }
 
-        "Bar : "
+        if (!App.candles.length) {
+            this.status.innerHTML = "Waiting CSV...";
+            return;
+        }
 
-        +Replay.index
+        const candle = Replay.current();
+        const mode = Replay.playing ? "Playing" : "Paused";
+        const active = Trade.positions.length;
+        const pending = Trade.pending.length;
 
-        +" / "
-
-        +App.candles.length;
-
+        this.status.innerHTML = `${mode} | ${new Date(candle.time * 1000).toLocaleString()} | Pending: ${pending} | Open: ${active}`;
     }
-
 };
