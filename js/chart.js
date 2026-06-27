@@ -1,5 +1,5 @@
 // ===============================
-// GOLD REPLAY V0.1
+// GOLD REPLAY CHART ENGINE
 // ===============================
 
 const chartContainer = document.getElementById("chart");
@@ -42,78 +42,51 @@ App.chart = LightweightCharts.createChart(chartContainer, {
 App.candleSeries = App.chart.addCandlestickSeries({
     upColor: "#26a69a",
     downColor: "#ef5350",
-
     borderVisible: false,
-
     wickUpColor: "#26a69a",
     wickDownColor: "#ef5350"
 });
 
 window.addEventListener("resize", () => {
-
     App.chart.applyOptions({
-
         width: chartContainer.clientWidth,
-
         height: chartContainer.clientHeight
-
     });
-
 });
-
-status.innerHTML = "Chart Ready - Waiting CSV...";
-
-// ======================================
-// LOAD CSV
-// ======================================
 
 const csvFile = document.getElementById("csvFile");
 const btnLoad = document.getElementById("btnLoad");
 
 btnLoad.addEventListener("click", () => {
-
     if (!csvFile.files.length) {
-
         alert("Pilih file CSV terlebih dahulu.");
-
         return;
-
     }
 
     const reader = new FileReader();
 
-    reader.onload = function (e) {
-
-        parseCSV(e.target.result);
-
+    reader.onload = function (event) {
+        parseCSV(event.target.result);
     };
 
     reader.readAsText(csvFile.files[0]);
-
 });
 
-
-// ======================================
-// CHART ENGINE
-// ======================================
-
 const Chart = {
-
     render() {
+        if (!App.candleSeries) return;
 
-        if (!App.candles.length)
-            return;
+        App.candleSeries.setData(Replay.visibleCandles());
 
-        App.candleSeries.setData(
+        if (App.candles.length) {
+            App.chart.timeScale().scrollToPosition(0, false);
+        }
+    },
 
-            App.candles.slice(
-                0,
-                Replay.index + 1
-            )
-
-        );
-
+    clear() {
+        if (!App.candleSeries) return;
+        App.candleSeries.setData([]);
     }
-
 };
 
+status.innerHTML = "Chart Ready - Waiting CSV...";
