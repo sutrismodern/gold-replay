@@ -3,115 +3,135 @@
 // =========================================
 
 const Replay = {
+    get start() {
+        return App.replay.start;
+    },
 
-    // Posisi replay dimulai dari candle ke-100
-    start: 0,
+    set start(value) {
+        App.replay.start = this.clampIndex(value);
+    },
 
-    // Candle yang sedang aktif
-    index: 0,
+    get index() {
+        return App.replay.index;
+    },
 
-    // State untuk sprint berikutnya
-    playing: false,
-    timer: null,
-    speed: 1000,
+    set index(value) {
+        App.replay.index = this.clampIndex(value);
+    },
 
-    // -------------------------------------
-    // Ambil candle aktif
-    // -------------------------------------
+    get playing() {
+        return App.replay.playing;
+    },
+
+    set playing(value) {
+        App.replay.playing = Boolean(value);
+    },
+
+    get speed() {
+        return App.replay.speed;
+    },
+
+    set speed(value) {
+        App.replay.speed = Math.max(100, Number(value) || 1000);
+    },
+
+    clampIndex(index) {
+        if (!App.candles.length) return 0;
+
+        const parsed = Number(index);
+        if (!Number.isFinite(parsed)) return 0;
+
+        return Math.min(
+            Math.max(Math.floor(parsed), 0),
+            App.candles.length - 1
+        );
+    },
+
+    hasData() {
+        return App.candles.length > 0;
+    },
+
     current() {
+        if (!this.hasData()) return null;
         return App.candles[this.index];
     },
 
-    // -------------------------------------
-    // Next Candle
-    // -------------------------------------
+    visibleCandles() {
+        if (!this.hasData()) return [];
+        return App.candles.slice(0, this.index + 1);
+    },
+
+    sync() {
+        Chart.render();
+        UI.updateCounter();
+        UI.updateStatus();
+    },
+
+    reset(startIndex = App.replay.start) {
+        if (!this.hasData()) {
+            this.index = 0;
+            this.sync();
+            return false;
+        }
+
+        this.index = startIndex;
+        Trade.reset();
+        Trade.replayTo(this.index);
+        this.sync();
+        return true;
+    },
+
     next() {
+        if (!this.hasData()) return false;
+        if (this.index >= App.candles.length - 1) return false;
 
-    if (!App.candles.length)
-        return false;
+        this.index++;
+        Trade.update(this.current());
+        this.sync();
+        return true;
+    },
 
-    if (this.index >= App.candles.length - 1)
-        return false;
-
-    this.index++;
-
-    Trade.update();
-
-    Chart.render();
-
-    UI.updateCounter();
-
-    return true;
-
-},
-
-    // -------------------------------------
-    // Previous Candle
-    // -------------------------------------
     prev() {
+        if (!this.hasData()) return false;
+        if (this.index <= this.start) return false;
 
-        if (!App.candles.length)
-        return false;
-
-    if (this.index >= App.candles.length - 1)
-        return false;
-
-    this.index++;
-
-    Trade.update();
-
-    Chart.render();
-
-    UI.updateCounter();
-
-    return true;
-
+        this.index--;
+        Trade.rebuildTo(this.index);
+        this.sync();
+        return true;
     },
 
-    // -------------------------------------
-    // Reset Replay
-    // -------------------------------------
-    reset() {
-
-        if (!App.candles.length)
-        return false;
-
-    if (this.index >= App.candles.length - 1)
-        return false;
-
-    this.index++;
-
-    Trade.update();
-
-    Chart.render();
-
-    UI.updateCounter();
-
-    return true;
-
-    },
-
-    // -------------------------------------
-    // Lompat ke candle tertentu
-    // -------------------------------------
     goto(index) {
+        if (!this.hasData()) return false;
 
-        if (!App.candles.length)
-        return false;
+        const target = this.clampIndex(index);
+        this.index = target;
+        Trade.rebuildTo(target);
+        this.sync();
+        return true;
+    },
 
-    if (this.index >= App.candles.length - 1)
-        return false;
+    play() {
+        if (this.playing || !this.hasData()) return false;
 
-    this.index++;
+        this.playing = true;
+        App.replay.timer = setInterval(() => {
+            if (!this.next()) this.pause();
+        }, this.speed);
 
-    Trade.update();
+        UI.updateStatus();
+        return true;
+    },
 
-    Chart.render();
+    pause() {
+        this.playing = false;
 
-    UI.updateCounter();
+        if (App.replay.timer) {
+            clearInterval(App.replay.timer);
+            App.replay.timer = null;
+        }
 
-    return true;
-
+        UI.updateStatus();
+        return true;
     }
-
 };
