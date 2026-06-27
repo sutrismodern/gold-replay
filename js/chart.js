@@ -76,10 +76,13 @@ const Chart = {
     render() {
         if (!App.candleSeries) return;
 
+        const timeScale = App.chart.timeScale();
+        const visibleRange = timeScale.getVisibleLogicalRange();
+
         App.candleSeries.setData(Replay.visibleCandles());
 
-        if (App.candles.length) {
-            App.chart.timeScale().scrollToPosition(0, false);
+        if (visibleRange) {
+            timeScale.setVisibleLogicalRange(visibleRange);
         }
     },
 
