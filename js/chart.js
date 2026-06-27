@@ -92,3 +92,28 @@ btnLoad.addEventListener("click", () => {
 
 });
 
+
+// ======================================
+// CHART ENGINE
+// ======================================
+
+const Chart = {
+
+    render() {
+
+        if (!App.candles.length)
+            return;
+
+        App.candleSeries.setData(
+
+            App.candles.slice(
+                0,
+                Replay.index + 1
+            )
+
+        );
+
+    }
+
+};
+
