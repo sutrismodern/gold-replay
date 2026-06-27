@@ -1,20 +1,10 @@
-status.innerHTML = "Ready";
-document
-
-.getElementById("btnNext")
-
-.onclick=()=>{
-
+document.getElementById("btnNext").onclick = () => {
     Replay.next();
-
 };
 
-document
-
-.getElementById("btnPrev")
-
-.onclick=()=>{
-
+document.getElementById("btnPrev").onclick = () => {
     Replay.prev();
-
 };
+
+UI.updateCounter();
+UI.updateStatus();
