@@ -39,7 +39,7 @@ App.chart = LightweightCharts.createChart(chartContainer, {
     }
 });
 
-App.candleSeries = chart.addCandlestickSeries({
+App.candleSeries = App.chart.addCandlestickSeries({
     upColor: "#26a69a",
     downColor: "#ef5350",
 
@@ -51,7 +51,7 @@ App.candleSeries = chart.addCandlestickSeries({
 
 window.addEventListener("resize", () => {
 
-    chart.applyOptions({
+    App.chart.applyOptions({
 
         width: chartContainer.clientWidth,
 
@@ -136,9 +136,9 @@ function parseCSV(text) {
 
     }
 
-    candleSeries.setData(data);
+    App.candleSeries.setData(data);
 
-    chart.timeScale().fitContent();
+    App.chart.timeScale().fitContent();
 
     status.innerHTML =
         "Loaded " + data.length + " candles";

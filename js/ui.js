@@ -1,12 +1,18 @@
-const UI = {
+const UI={
 
-    updateCounter() {
+    counter:document.getElementById("counter"),
 
-        status.innerHTML =
-            "Bar : "
-            + Replay.index
-            + " / "
-            + App.candles.length;
+    updateCounter(){
+
+        this.counter.innerHTML=
+
+        "Bar : "
+
+        +Replay.index
+
+        +" / "
+
+        +App.candles.length;
 
     }
 

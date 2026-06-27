@@ -1,11 +1,43 @@
-const App={
+const App = {
 
-    candles:[],
+    // ===== DATA =====
 
-    replayIndex:0,
+    candles: [],
 
-    chart:null,
+    // ===== CHART =====
 
-    candleSeries:null
+    chart: null,
+
+    candleSeries: null,
+
+    // ===== REPLAY =====
+
+    replay: {
+
+        start: 300,
+
+        index: 300
+
+    },
+
+    // ===== ORDER =====
+
+    orders: [],
+
+    history: [],
+
+    // ===== DRAWING =====
+
+    drawings: [],
+
+    // ===== INDICATORS =====
+
+    indicators: {
+
+        ema: [],
+
+        atr: null
+
+    }
 
 };

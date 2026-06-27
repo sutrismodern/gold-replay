@@ -40,16 +40,24 @@ const Replay = {
 
     },
 
-    reset() {
+    reset(){
 
-        this.index = this.start;
+    this.index=this.start;
 
-        App.candleSeries.setData(
-            App.candles.slice(0, this.start + 1)
-        );
+    App.candleSeries.setData(
 
-        UI.updateCounter();
+        App.candles.slice(
 
-    }
+            0,
+
+            this.index+1
+
+        )
+
+    );
+
+    UI.updateCounter();
+
+}
 
 };
