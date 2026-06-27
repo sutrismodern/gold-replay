@@ -14,6 +14,7 @@ const App = {
 
     trading: {
         nextId: 1,
+        orders: [],
         pending: [],
         positions: [],
         history: [],
