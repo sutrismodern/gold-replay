@@ -7,10 +7,7 @@
 
     <title>Gold Replay</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- TradingView Lightweight Charts -->
 </head>
 
 <body>
@@ -18,72 +15,96 @@
 <div id="app">
 
     <header>
-
         <div class="logo">
-
-            <h1>🟡 Gold Replay</h1>
-
+            <h1>Gold Replay</h1>
             <span>Offline Backtesting Tool</span>
-
         </div>
 
         <div class="toolbar">
-
-            <input
-                type="file"
-                id="csvFile"
-                accept=".csv,.txt">
-
-            <button id="btnLoad">
-                Load CSV
-            </button>
-
+            <input type="file" id="csvFile" accept=".csv,.txt">
+            <button id="btnLoad">Load CSV</button>
         </div>
-
     </header>
 
     <main>
+        <section class="chart-area">
+            <div id="chart"></div>
+        </section>
 
-        <div id="chart"></div>
+        <aside class="trade-panel">
+            <div class="panel-section">
+                <div class="section-title">Order</div>
 
+                <div class="field-grid">
+                    <label>
+                        Entry
+                        <input type="number" id="orderEntry" step="0.01" placeholder="0.00">
+                    </label>
+
+                    <label>
+                        Volume
+                        <input type="number" id="orderVolume" step="0.01" min="0.01" value="1">
+                    </label>
+
+                    <label>
+                        Stop Loss
+                        <input type="number" id="orderSL" step="0.01" placeholder="Optional">
+                    </label>
+
+                    <label>
+                        Take Profit
+                        <input type="number" id="orderTP" step="0.01" placeholder="Optional">
+                    </label>
+                </div>
+
+                <div class="order-actions">
+                    <button id="btnBuyStop" class="buy-btn">Buy Stop</button>
+                    <button id="btnSellStop" class="sell-btn">Sell Stop</button>
+                    <button id="btnUseClose" class="ghost-btn">Use Close</button>
+                </div>
+            </div>
+
+            <div class="panel-section summary-row" id="tradeSummary">
+                Pending 0 | Open 0 | Closed 0
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Pending</div>
+                <div id="pendingList" class="trade-list empty-list">No pending orders</div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-title">Positions</div>
+                <div id="positionsList" class="trade-list empty-list">No open positions</div>
+            </div>
+
+            <div class="panel-section history-section">
+                <div class="section-title">History</div>
+                <div id="historyList" class="trade-list empty-list">No closed trades</div>
+            </div>
+        </aside>
     </main>
 
     <footer>
-<div id="replayBar">
-
-    <button id="btnPrev">◀ Prev</button>
-
-    <button id="btnNext">Next ▶</button>
-
-    <span id="counter">Bar : 0 / 0</span>
-
-</div>
-        <div id="status">
-
-            Waiting CSV...
-
+        <div id="replayBar">
+            <button id="btnPrev">Prev</button>
+            <button id="btnNext">Next</button>
+            <span id="counter">Bar : 0 / 0</span>
         </div>
 
+        <div id="status">Waiting CSV...</div>
     </footer>
 
 </div>
 
 <script src="vendor/lightweight-charts.js"></script>
-
 <script src="js/storage.js"></script>
-
-<script src="js/utils.js"></script> 
-
-<script src="js/chart.js"></script> 
-
-<script src="js/csvParser.js"></script> 
-
-<script src="js/replay.js"></script> 
-
+<script src="js/utils.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/csvParser.js"></script>
+<script src="js/replay.js"></script>
 <script src="js/trade.js"></script>
-
 <script src="js/ui.js"></script>
-
 <script src="app.js"></script>
 
 </body>
