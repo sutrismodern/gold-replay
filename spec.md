@@ -1,4 +1,3 @@
-# gold-replay
 # Gold Replay
 Version : 0.1
 Status : Development

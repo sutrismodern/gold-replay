@@ -1,0 +1,1 @@
+status.innerHTML="Chart Ready";

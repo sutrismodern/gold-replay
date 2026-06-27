@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Gold Replay</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- TradingView Lightweight Charts -->
+</head>
+
+<body>
+
+<div id="app">
+
+    <header>
+
+        <div class="logo">
+
+            <h1>🟡 Gold Replay</h1>
+
+            <span>Offline Backtesting Tool</span>
+
+        </div>
+
+        <div class="toolbar">
+
+            <input
+                type="file"
+                id="csvFile"
+                accept=".csv,.txt">
+
+            <button id="btnLoad">
+                Load CSV
+            </button>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <div id="chart"></div>
+
+    </main>
+
+    <footer>
+
+        <div id="status">
+
+            Waiting CSV...
+
+        </div>
+
+    </footer>
+
+</div>
+
+<script src="vendor/lightweight-charts.js"></script>
+
+<script src="js/utils.js"></script>
+
+<script src="js/chart.js"></script>
+
+<script src="js/csvParser.js"></script>
+
+<script src="js/replay.js"></script>
+
+<script src="js/trade.js"></script>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>
