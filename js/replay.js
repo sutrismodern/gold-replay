@@ -4,9 +4,9 @@
 
 const Replay = {
 
-    index: 300,
+    index: 100,
 
-    start: 300,
+    start: 100,
 
     step: 1,
 
