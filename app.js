@@ -37,6 +37,7 @@ function createPendingOrder(type) {
 
     try {
         Trade.createPending(readOrderForm(type));
+        Chart.render();
     } catch (error) {
         UI.updateStatus(error.message);
     }
@@ -55,6 +56,7 @@ function closePositionAtMarket(id) {
         time: candle.time
     });
 
+    Chart.render();
     UI.updateStatus("Position closed manually");
 }
 
@@ -84,6 +86,7 @@ document.addEventListener("click", event => {
 
     if (cancelButton) {
         Trade.cancelPending(Number(cancelButton.dataset.cancelOrder));
+        Chart.render();
     }
 
     if (closeButton) {
