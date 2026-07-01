@@ -74,6 +74,7 @@ btnLoad.addEventListener("click", () => {
 
 const Chart = {
     priceLines: [],
+    clickHandlers: [],
 
     render() {
         if (!App.candleSeries) return;
@@ -94,6 +95,24 @@ const Chart = {
 
         App.candleSeries.setData([]);
         this.clearTradeLines();
+    },
+
+    onPriceClick(handler) {
+        this.clickHandlers.push(handler);
+    },
+
+    emitPriceClick(price) {
+        this.clickHandlers.forEach(handler => handler(price));
+    },
+
+    priceFromClick(param) {
+        if (!param || !param.point || typeof param.point.y !== "number") return null;
+
+        if (typeof App.candleSeries.coordinateToPrice === "function") {
+            return App.candleSeries.coordinateToPrice(param.point.y);
+        }
+
+        return null;
     },
 
     renderTradeLines() {
@@ -170,5 +189,12 @@ const Chart = {
         return LightweightCharts.LineStyle[name] ?? LightweightCharts.LineStyle.Solid ?? 0;
     }
 };
+
+App.chart.subscribeClick(param => {
+    const price = Chart.priceFromClick(param);
+    if (price === null || !Number.isFinite(price)) return;
+
+    Chart.emitPriceClick(price);
+});
 
 status.innerHTML = "Chart Ready - Waiting CSV...";
