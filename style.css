@@ -109,6 +109,37 @@ main {
     border-color: #f0b90b;
 }
 
+.chart-menu {
+    background: #101923;
+    border: 1px solid #3c4f66;
+    border-radius: 6px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    display: none;
+    min-width: 150px;
+    padding: 5px;
+    position: fixed;
+    z-index: 20;
+}
+
+.chart-menu.visible {
+    display: grid;
+    gap: 4px;
+}
+
+.chart-menu button {
+    background: transparent;
+    color: #e6edf5;
+    font-weight: 600;
+    padding: 8px 10px;
+    text-align: left;
+    width: 100%;
+}
+
+.chart-menu button:hover {
+    background: #26364a;
+    color: #fff;
+}
+
 .trade-panel {
     min-width: 0;
     min-height: 0;
