@@ -73,6 +73,8 @@ btnLoad.addEventListener("click", () => {
 });
 
 const Chart = {
+    priceLines: [],
+
     render() {
         if (!App.candleSeries) return;
 
@@ -80,6 +82,7 @@ const Chart = {
         const visibleRange = timeScale.getVisibleLogicalRange();
 
         App.candleSeries.setData(Replay.visibleCandles());
+        this.renderTradeLines();
 
         if (visibleRange) {
             timeScale.setVisibleLogicalRange(visibleRange);
@@ -88,7 +91,83 @@ const Chart = {
 
     clear() {
         if (!App.candleSeries) return;
+
         App.candleSeries.setData([]);
+        this.clearTradeLines();
+    },
+
+    renderTradeLines() {
+        this.clearTradeLines();
+
+        Trade.pending.forEach(order => {
+            this.addPriceLine({
+                price: order.entry,
+                color: order.type === "BUY_STOP" ? "#22c55e" : "#ef4444",
+                title: `#${order.id} ${order.type.replace("_", " ")}`,
+                style: this.lineStyle("Dashed")
+            });
+
+            this.addRiskLines(order);
+        });
+
+        Trade.positions.forEach(position => {
+            this.addPriceLine({
+                price: position.entry,
+                color: position.type === "BUY" ? "#22c55e" : "#ef4444",
+                title: `#${position.id} ${position.type} ENTRY`,
+                style: this.lineStyle("Solid")
+            });
+
+            this.addRiskLines(position);
+        });
+    },
+
+    addRiskLines(trade) {
+        if (trade.sl !== null) {
+            this.addPriceLine({
+                price: trade.sl,
+                color: "#f97316",
+                title: `#${trade.id} SL`,
+                style: this.lineStyle("Dotted")
+            });
+        }
+
+        if (trade.tp !== null) {
+            this.addPriceLine({
+                price: trade.tp,
+                color: "#38bdf8",
+                title: `#${trade.id} TP`,
+                style: this.lineStyle("Dotted")
+            });
+        }
+    },
+
+    addPriceLine(options) {
+        const priceLine = App.candleSeries.createPriceLine({
+            price: options.price,
+            color: options.color,
+            lineWidth: 1,
+            lineStyle: options.style,
+            axisLabelVisible: true,
+            title: options.title
+        });
+
+        this.priceLines.push(priceLine);
+    },
+
+    clearTradeLines() {
+        if (!App.candleSeries) return;
+
+        this.priceLines.forEach(priceLine => {
+            App.candleSeries.removePriceLine(priceLine);
+        });
+
+        this.priceLines = [];
+    },
+
+    lineStyle(name) {
+        if (!LightweightCharts.LineStyle) return 0;
+        return LightweightCharts.LineStyle[name] ?? LightweightCharts.LineStyle.Solid ?? 0;
     }
 };
 
