@@ -350,4 +350,92 @@ const Trade = {
     replayTo(index) {
         this.rebuildTo(index);
     }
+    exportHistoryCSV() {
+
+    if (!this.history.length) {
+        UI.updateStatus("Belum ada history untuk diexport.");
+        return;
+    }
+
+    const rows = [];
+
+    rows.push([
+        "ID",
+        "Type",
+        "Entry",
+        "Exit",
+        "SL",
+        "TP",
+        "Volume",
+        "Profit",
+        "Reason",
+        "Open Time",
+        "Close Time",
+        "Open Bar",
+        "Close Bar"
+    ]);
+
+    this.history.forEach(trade => {
+
+        rows.push([
+
+            trade.id,
+
+            trade.type,
+
+            trade.entry,
+
+            trade.exit,
+
+            trade.sl ?? "",
+
+            trade.tp ?? "",
+
+            trade.volume,
+
+            trade.profit,
+
+            trade.closeReason,
+
+            trade.openTime,
+
+            trade.closeTime,
+
+            trade.openBar,
+
+            trade.closeBar
+
+        ]);
+
+    });
+
+    const csv = rows
+        .map(row =>
+            row.map(value => `"${String(value ?? "").replace(/"/g, '""')}"`).join(",")
+        )
+        .join("\n");
+
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+
+    a.download = `gold-replay-history-${new Date().toISOString().slice(0,19).replace(/:/g,"-")}.csv`;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    UI.updateStatus("History berhasil diexport.");
+
+}
 };
