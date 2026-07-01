@@ -2,6 +2,10 @@ const orderEntry = document.getElementById("orderEntry");
 const orderSL = document.getElementById("orderSL");
 const orderTP = document.getElementById("orderTP");
 const orderVolume = document.getElementById("orderVolume");
+const pickHint = document.getElementById("pickHint");
+const pickButtons = document.querySelectorAll("[data-pick-price]");
+
+let activePickField = null;
 
 function getCurrentClose() {
     const candle = Replay.current();
@@ -60,6 +64,38 @@ function closePositionAtMarket(id) {
     UI.updateStatus("Position closed manually");
 }
 
+function setPickMode(field) {
+    activePickField = activePickField === field ? null : field;
+
+    pickButtons.forEach(button => {
+        button.classList.toggle("active-pick", button.dataset.pickPrice === activePickField);
+    });
+
+    chartContainer.classList.toggle("picking-price", Boolean(activePickField));
+
+    if (!activePickField) {
+        pickHint.className = "pick-hint";
+        pickHint.innerHTML = "Chart pick: off";
+        return;
+    }
+
+    pickHint.className = "pick-hint active";
+    pickHint.innerHTML = `Click chart to set ${activePickField.toUpperCase()}`;
+}
+
+function applyPickedPrice(price) {
+    if (!activePickField) return;
+
+    const value = Number(price).toFixed(2);
+
+    if (activePickField === "entry") orderEntry.value = value;
+    if (activePickField === "sl") orderSL.value = value;
+    if (activePickField === "tp") orderTP.value = value;
+
+    UI.updateStatus(`${activePickField.toUpperCase()} set at ${value}`);
+    setPickMode(null);
+}
+
 document.getElementById("btnNext").onclick = () => {
     Replay.next();
 };
@@ -79,6 +115,21 @@ document.getElementById("btnBuyStop").onclick = () => {
 document.getElementById("btnSellStop").onclick = () => {
     createPendingOrder("SELL_STOP");
 };
+
+pickButtons.forEach(button => {
+    button.onclick = () => {
+        if (!App.candles.length) {
+            UI.updateStatus("Load CSV first");
+            return;
+        }
+
+        setPickMode(button.dataset.pickPrice);
+    };
+});
+
+Chart.onPriceClick(price => {
+    applyPickedPrice(price);
+});
 
 document.addEventListener("click", event => {
     const cancelButton = event.target.closest("[data-cancel-order]");
