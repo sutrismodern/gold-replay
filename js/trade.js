@@ -54,13 +54,14 @@ const Trade = {
     createPending(data) {
         const order = this.normalizeOrder(data);
 
+        this.validatePendingDistance(order);
         this.state.orders.push(order);
 
         if (order.createdBar <= Replay.index) {
             this.pending.push({ ...order });
+            this.sortPending();
         }
 
-        UI.updateStatus("Pending order created");
         return order;
     },
 
@@ -92,6 +93,26 @@ const Trade = {
         return order;
     },
 
+    validatePendingDistance(order) {
+        const candle = Replay.current();
+        if (!candle) return;
+
+        const distance = Math.abs(order.entry - candle.close);
+        const minimum = Number(this.settings.minPendingDistance) || 0;
+
+        if (distance < minimum) {
+            throw new Error(`Pending order minimum distance is ${minimum} USD`);
+        }
+
+        if (order.type === "BUY_STOP" && order.entry <= candle.close) {
+            throw new Error("Buy Stop must be above current price");
+        }
+
+        if (order.type === "SELL_STOP" && order.entry >= candle.close) {
+            throw new Error("Sell Stop must be below current price");
+        }
+    },
+
     removePending(id) {
         this.pending = this.pending.filter(order => order.id !== id);
     },
@@ -99,14 +120,14 @@ const Trade = {
     cancelPending(id) {
         const order = this.state.orders.find(item => item.id === id);
 
-        if (order) {
+        if (order && order.status === "PENDING") {
             order.status = "CANCELLED";
             order.cancelledBar = Replay.index;
             order.cancelledTime = Replay.current()?.time ?? null;
         }
 
         this.removePending(id);
-        UI.updateStatus("Pending order cancelled");
+        return order || null;
     },
 
     getPending(id) {
@@ -137,6 +158,15 @@ const Trade = {
                 this.pending.push({ ...order });
             }
         });
+
+        this.sortPending();
+    },
+
+    sortPending() {
+        this.pending.sort((a, b) => {
+            if (a.createdBar !== b.createdBar) return a.createdBar - b.createdBar;
+            return a.id - b.id;
+        });
     },
 
     checkPending(candle) {
@@ -144,6 +174,7 @@ const Trade = {
 
         const activated = [];
 
+        this.sortPending();
         this.pending.forEach(order => {
             if (order.type === "BUY_STOP" && candle.high >= order.entry) {
                 activated.push(order);
@@ -158,6 +189,14 @@ const Trade = {
     },
 
     activate(order, candle) {
+        if (this.positions.some(position => position.id === order.id)) return null;
+        if (this.history.some(trade => trade.id === order.id)) {
+            this.removePending(order.id);
+            return null;
+        }
+
+        if (!this.canOpenPosition(order)) return null;
+
         const direction = order.type === "BUY_STOP" ? "BUY" : "SELL";
         const entry = this.applySlippage(order.entry, direction, "OPEN");
 
@@ -178,6 +217,18 @@ const Trade = {
 
         const sourceOrder = this.state.orders.find(item => item.id === order.id);
         if (sourceOrder) sourceOrder.status = "OPEN";
+
+        return position;
+    },
+
+    canOpenPosition(order) {
+        const maxPositions = Number(this.settings.maxPositions) || Infinity;
+        if (this.positions.length >= maxPositions) return false;
+
+        const minDistance = Number(this.settings.minPositionDistance) || 0;
+        return this.positions.every(position => {
+            return Math.abs(position.entry - order.entry) >= minDistance;
+        });
     },
 
     checkPositions(candle) {
@@ -185,7 +236,7 @@ const Trade = {
 
         const closed = [];
 
-        this.positions.forEach(position => {
+        this.positions.slice().forEach(position => {
             const exit = this.resolveExit(position, candle);
             if (exit) closed.push({ position, exit });
         });
@@ -233,6 +284,8 @@ const Trade = {
     },
 
     closePosition(id, exit) {
+        if (this.history.some(trade => trade.id === id)) return null;
+
         const position = this.positions.find(item => item.id === id);
         if (!position) return null;
 
@@ -275,7 +328,9 @@ const Trade = {
     rebuildTo(index) {
         const orders = this.state.orders.map(order => ({
             ...order,
-            status: order.status === "CANCELLED" ? "CANCELLED" : "PENDING"
+            status: order.status === "CANCELLED" && order.cancelledBar <= index
+                ? "CANCELLED"
+                : "PENDING"
         }));
 
         this.reset(false);
