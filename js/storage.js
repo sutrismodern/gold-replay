@@ -23,7 +23,10 @@ const App = {
             pointValue: 100,
             spread: 0,
             slippage: 0,
-            intrabarMode: "conservative"
+            intrabarMode: "conservative",
+            maxPositions: 3,
+            minPendingDistance: 2,
+            minPositionDistance: 5
         }
     },
 
