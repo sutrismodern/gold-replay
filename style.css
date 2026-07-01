@@ -40,6 +40,7 @@ header {
 
 .toolbar,
 .order-actions,
+.pick-actions,
 #replayBar {
     display: flex;
     align-items: center;
@@ -103,6 +104,11 @@ main {
     background: #131722;
 }
 
+#chart.picking-price {
+    cursor: crosshair;
+    border-color: #f0b90b;
+}
+
 .trade-panel {
     min-width: 0;
     min-height: 0;
@@ -139,14 +145,27 @@ label {
     font-size: 12px;
 }
 
-.order-actions {
+.order-actions,
+.pick-actions {
     margin-top: 10px;
     align-items: stretch;
 }
 
-.order-actions button {
+.order-actions button,
+.pick-actions button {
     flex: 1;
     padding-inline: 10px;
+}
+
+.pick-hint {
+    color: #9aa7b6;
+    font-size: 12px;
+    margin-top: 8px;
+    min-height: 16px;
+}
+
+.pick-hint.active {
+    color: #f0b90b;
 }
 
 .buy-btn {
@@ -176,6 +195,11 @@ label {
 .ghost-btn:hover,
 .trade-card button:hover {
     background: #344963;
+}
+
+.ghost-btn.active-pick {
+    background: #f0b90b;
+    color: #111827;
 }
 
 .summary-row {
